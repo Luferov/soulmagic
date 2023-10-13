@@ -1,4 +1,6 @@
+import { TypeInfo } from '.keystone/types'
 import { config } from '@keystone-6/core'
+import { KeystoneConfig } from '@keystone-6/core/types'
 
 import { withAuth, session } from './keystone/auth'
 import { extendGraphqlSchema } from './keystone/graphql'
@@ -10,7 +12,6 @@ export default withAuth(
     db: {
       provider: 'sqlite',
       url: `file:${process.cwd()}/keystone.db`,
-      // WARNING: this is only needed for our monorepo examples, dont do this
       prismaClientPath: 'node_modules/.prisma/client',
     },
     lists: { User },
@@ -18,4 +19,4 @@ export default withAuth(
     server,
     extendGraphqlSchema,
   }),
-)
+) as KeystoneConfig<TypeInfo>

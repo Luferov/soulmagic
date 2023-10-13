@@ -1,3 +1,9 @@
 /** @type {import('next').NextConfig} */
 
-module.exports = {}
+const config = {
+  experimental: {
+    serverComponentsExternalPackages: ['@whatwg-node', '@aws-sdk'],
+  },
+}
+
+module.exports = config

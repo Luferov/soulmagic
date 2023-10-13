@@ -15,6 +15,7 @@
     "ks:start": "keystone start",
     "ks:build": "keystone build",
     "ks:postinstall": "keystone build --no-ui --frozen",
+    "ks:deploy": "keystone build && keystone prisma migrate deploy",
     "✨ Utilities": "",
     "lint": "next lint",
     "type-check": "tsc --pretty --noEmit",
