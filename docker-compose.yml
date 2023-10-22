@@ -1,0 +1,59 @@
+version: "3.9"
+
+x-postgres-variables: &postgres-variables
+  POSTGRES_DB: "${DB_NAME}"
+  POSTGRES_USER: "${DB_USER}"
+  POSTGRES_PASSWORD: "${DB_PASSWORD}"
+
+x-minio-variables: &minio-variables
+  MINIO_SERVER_URL: "${S3_SERVER_URL}"
+  MINIO_ROOT_USER: "${S3_SECRET_ACCESS_KEY}"
+  MINIO_ROOT_PASSWORD: "${S3_ACCESS_KEY_ID}"
+  MINIO_BUCKET: "${S3_BUCKET_NAME}"
+
+
+services:
+  postgres:
+    container_name: postgres-soulmagic
+    image: postgres:16
+    restart: always
+    environment:
+      <<: *postgres-variables
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+    healthcheck:
+      interval: 10s
+      retries: 10
+      test: "pg_isready -U ${DB_USER} -d ${DB_NAME}"
+      timeout: 2s
+
+  minio:
+    container_name: minio-soulmagic
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    environment:
+      <<: *minio-variables
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  minio-client:
+    container_name: minio-client-soulmagic
+    image: minio/mc
+    restart: unless-stopped
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        mc alias set local http://minio:9000 ${S3_SECRET_ACCESS_KEY} ${S3_ACCESS_KEY_ID}
+        mc mb --ignore-existing local/${S3_BUCKET_NAME}
+        mc anonymous set download local/${S3_BUCKET_NAME}
+    depends_on:
+      minio:
+        condition: service_started
+
+volumes:
+  postgres_data:
+    driver: local

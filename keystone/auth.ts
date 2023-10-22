@@ -10,11 +10,19 @@ const session: SessionStrategy<BaseKeystoneTypeInfo['session'], BaseKeystoneType
   secret,
 })
 
+export type Session = {
+  data: {
+    id: string
+    username: string
+    email: string
+  }
+}
+
 const { withAuth } = createAuth({
   listKey: 'User',
-  identityField: 'email',
+  identityField: 'username',
   secretField: 'password',
-  sessionData: 'id name email',
+  sessionData: 'id username email',
 })
 
 export { withAuth, session }
